@@ -277,10 +277,16 @@ void inlineBresenhamCircle(int xc, int yc, int rad)
 		setPixel(yxcm, xycp);
 		setPixel(yxcp, xycm);
 		setPixel(yxcm, xycm);
-		if (d < 0)
+		if (d < 0) {
+                        asm(
+                             "mov $200, %rdi"
+
+                           );
 			d += ((x << 2) + 6);
-		else
+                }
+		else {
 			d += (((x - y--) << 2) + 10);
+                }
 		++x;
 	}
 
