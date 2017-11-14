@@ -1,13 +1,7 @@
-//modified by:
-//date:
-//purpose:
-//
-//cmps 2240 lab12
-//Framework for simple graphics using X11.
-//
-//Draw a dot (pixel)
-//Draw several circles
-//
+//modified by: Derrick Alden
+//purpose: draw dot in center of circles
+//         draw more circles inside yellow circle
+//         convert some or all Bresenham algorithem to inline assembly
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -256,20 +250,39 @@ void BresenhamCircle(int xc, int yc, int rad)
 //=====================================================================
 void inlineBresenhamCircle(int xc, int yc, int rad)
 {
-	if (xc+yc+rad){} //remove this line when you start your work.
+//	if (xc+yc+rad){} //remove this line when you start your work.
 
-	//Copy and paste the Bresenham circle code from above, then start
-	//your inline assembly work.
 	//Convert some of the code in the algorithm, but not all.
-	//Double lab points for converting the entire algorithm
 	// into one asm() statement. Must be individual work.
 	//
 	//Choose a line of code that has a bit-shift operation.
-	//Bonus points for converting a line that includes a += or -- operator.
-
-
-
-
+	int x=0,y,d;
+	int xxcp,xxcm,xycp,xycm,yxcp,yxcm,yycp,yycm;
+	y = rad;
+	d = 3 - (rad << 1);
+	while (x <= y) {
+		xxcp = xc+x;
+		xxcm = xc-x;
+		xycp = xc+y;
+		xycm = xc-y;
+		yxcp = yc+x;
+		yxcm = yc-x;
+		yycp = yc+y;
+		yycm = yc-y;
+		setPixel(yycp, xxcp);
+		setPixel(yycm, xxcp);
+		setPixel(yycp, xxcm);
+		setPixel(yycm, xxcm);
+		setPixel(yxcp, xycp);
+		setPixel(yxcm, xycp);
+		setPixel(yxcp, xycm);
+		setPixel(yxcm, xycm);
+		if (d < 0)
+			d += ((x << 2) + 6);
+		else
+			d += (((x - y--) << 2) + 10);
+		++x;
+	}
 
 }
 //=====================================================================
@@ -295,7 +308,7 @@ void render()
 	//
 	//Show text in light blue at pixel location (15,15)
 	setColor(160, 200, 255);
-	char mess[] = "Lab13 cmps-2240";
+	char mess[] = "Lab12 cmps-2240";
 	XDrawString(dpy, backBuffer, gc, 15, 15, mess, strlen(mess));
 	//
 	//Draw a large yellow circle
@@ -303,12 +316,17 @@ void render()
 	BresenhamCircle(x, y, 160);
 	BresenhamCircle(x, y, 10);
 	//
+	//Draw a large yellow circle
+	setColor(255, 255, 0);
+	BresenhamCircle(x, y, 100);
+	BresenhamCircle(x, y, 10);
+	//
 	//==============================================
 	//This is part of the lab assignment...
 	//Draw a green circle inside the large circle.
 	//Convert some of the code to inline assembly.
 	//==============================================
-	setColor(100, 255, 100);
+	setColor(255, 255, 0);
 	inlineBresenhamCircle(x, y, 148);
 	//==============================================
 }
