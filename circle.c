@@ -250,16 +250,13 @@ void BresenhamCircle(int xc, int yc, int rad)
 //=====================================================================
 void inlineBresenhamCircle(int xc, int yc, int rad)
 {
-//	if (xc+yc+rad){} //remove this line when you start your work.
-
-	//Convert some of the code in the algorithm, but not all.
-	// into one asm() statement. Must be individual work.
-	//
-	//Choose a line of code that has a bit-shift operation.
 	int x=0,y,d;
 	int xxcp,xxcm,xycp,xycm,yxcp,yxcm,yycp,yycm;
 	y = rad;
 	d = 3 - (rad << 1);
+   //register int res asm("r0")=d;
+  int dst;
+  dst = d;
 	while (x <= y) {
 		xxcp = xc+x;
 		xxcm = xc-x;
@@ -277,12 +274,17 @@ void inlineBresenhamCircle(int xc, int yc, int rad)
 		setPixel(yxcm, xycp);
 		setPixel(yxcp, xycm);
 		setPixel(yxcm, xycm);
-		if (d < 0) {
-                        asm(
-                             "mov $200, %rdi"
 
-                           );
-			d += ((x << 2) + 6);
+		if (d < 0) {
+                        asm( "mov %1, %0\n\t"
+                             "shll $1, %0\n\t"
+                             "mov %1, %0\n\t"
+                             : "=r"(dst)
+                             : "r"(x));
+
+
+			d += ((x + dst) + 6);
+		//	d += ((x << 2) + 6);
                 }
 		else {
 			d += (((x - y--) << 2) + 10);
